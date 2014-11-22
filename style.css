@@ -1,0 +1,19 @@
+#part {
+  background-color: white;
+  width:50px;
+  height:50px;
+  border-style: solid;
+  border-color: #ff0000 #0000ff;
+}
+
+#target {
+  position: absolute;
+  left: 100px;
+  top: 100px;
+  background-color: white;
+  width:200px;
+  height:200px;
+  border-style: solid;
+  border-color: #ff0000 #0000ff;
+  z-index: -1;
+}

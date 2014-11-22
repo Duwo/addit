@@ -3,11 +3,85 @@
 <html>
   <head>
     <title> Part of the process </title>
-    <script src="potp.js" type="text/"></script>
+    <script src="potp.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+ 
   </head>
 
   <body>
-             
+    <div id="part" >
+    </div>  
+    <div id="target">
+    </div>  
+    <script>
+    window.onload = addListeners;
+    var part = document.getElementById("part");
+    var rect = part.getBoundingClientRect();
+
+    var target = document.getElementById("target");
+    var rect = target.getBoundingClientRect();
+
+
+    // Setting starting values for the part
+    var part = {value : 10, 
+                width : document.getElementById("part").clientWidth,
+                height :  document.getElementById("part").clientHeight,
+                xpos : rect.left,
+                ypos : rect.top
+                };
+
+    document.getElementById("part").innerHTML = part.value + "<br />" +
+                                                "xpos: " + part.xpos;
+
+    // Setting starting values for the target
+    var target = {targetValue : 100, 
+                  currentValue : 0,
+                  width : 100,
+                  height : 100, 
+                  xpos : 100,
+                  ypos : 100 };
+
+    document.getElementById("target").innerHTML = "targetValue: " + target.targetValue + "<br />" +
+                                                "currentValue: " + target.currentValue;
+
+
+    function addListeners(){
+        document.getElementById('part').addEventListener('mousedown', mouseDown, false);
+        window.addEventListener('mouseup', mouseUp, false);
+
+    }
+
+    function mouseUp()
+    {
+        window.removeEventListener('mousemove', divMove, true);
+        document.getElementById("part").innerHTML = part.value + "<br />"  +
+                                                "xpos: " + part.xpos;
+        if (parseInt(part.xpos) >= parseInt(target.xpos) &&  parseInt(part.xpos) <= parseInt(target.xpos) + parseInt(target.width) ) {
+          alert(parseInt(target.xpos) + parseInt(target.width))
+          target.currentValue = target.currentValue + part.value;
+          document.getElementById("target").innerHTML = "targetValue: " + target.targetValue + "<br />"+ "currentValue: " + target.currentValue;         
+        };
+    
+    }
+
+    function mouseDown(e){      
+      var div = document.getElementById('part');
+      
+      window.addEventListener('mousemove', divMove, true);
+      }
+    function divMove(e){
+      var div = document.getElementById('part');
+
+      div.style.position = 'absolute';
+      div.style.left = e.clientX - (div.clientWidth / 2 ) + "px";
+      div.style.top = e.clientY - (div.clientHeight / 2 ) + "px";
+      part.xpos = div.style.left
+      part.ypos = div.style.top
+      }
+
+
+    </script>
+         
   </body>
 
 
