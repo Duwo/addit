@@ -30,14 +30,13 @@
                 ypos : rect.top
                 };
 
-    document.getElementById("part").innerHTML = part.value + "<br />" +
-                                                "xpos: " + part.xpos;
+    document.getElementById("part").innerHTML = part.value
 
     // Setting starting values for the target
     var target = {targetValue : 100, 
                   currentValue : 0,
-                  width : 100,
-                  height : 100, 
+                  width : 300,
+                  height : 300, 
                   xpos : 100,
                   ypos : 100 };
 
@@ -45,6 +44,8 @@
                                                 "currentValue: " + target.currentValue;
 
 
+
+    // Listeners for mouse Actions
     function addListeners(){
         document.getElementById('part').addEventListener('mousedown', mouseDown, false);
         window.addEventListener('mouseup', mouseUp, false);
@@ -54,21 +55,26 @@
     function mouseUp()
     {
         window.removeEventListener('mousemove', divMove, true);
-        document.getElementById("part").innerHTML = part.value + "<br />"  +
-                                                "xpos: " + part.xpos;
-        if (parseInt(part.xpos) >= parseInt(target.xpos) &&  parseInt(part.xpos) <= parseInt(target.xpos) + parseInt(target.width) ) {
-          alert(parseInt(target.xpos) + parseInt(target.width))
+
+        // Conditions to add value
+        if (parseInt(part.xpos) >= parseInt(target.xpos) 
+          &&  parseInt(part.xpos) <= parseInt(target.xpos) + parseInt(target.width) 
+          &&  parseInt(part.ypos) >= parseInt(target.ypos)
+          &&  parseInt(part.ypos) <= parseInt(target.ypos) + parseInt(target.height) 
+          ) {
+
           target.currentValue = target.currentValue + part.value;
           document.getElementById("target").innerHTML = "targetValue: " + target.targetValue + "<br />"+ "currentValue: " + target.currentValue;         
         };
     
     }
-
+    
     function mouseDown(e){      
       var div = document.getElementById('part');
       
       window.addEventListener('mousemove', divMove, true);
-      }
+      };
+      
     function divMove(e){
       var div = document.getElementById('part');
 
