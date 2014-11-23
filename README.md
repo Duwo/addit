@@ -3,7 +3,7 @@ part_of_the_process
 
 Javascript game
 
-TODO
+TODO:
 Test tool for javascript
 
 Game engine for javascript
