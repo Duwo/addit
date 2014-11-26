@@ -28,9 +28,9 @@ var Target = function(targetValue) {
             this.partIds.splice(index, 1);
             this.includedParts.splice(index, 1);
 
-        }
-        console.log(this.includedParts)
-        console.log(this.partIds)
+        };
+        console.log(this.includedParts);
+        console.log(this.partIds);
     };
 
     this.draw = function() {
@@ -52,7 +52,7 @@ var Part = function(value) {
     this.posy = 100;
     this.radius = 30;
     this.id = idCounter++;
-    console.log(idCounter)
+    console.log(idCounter);
 
 
     this.draw = function() {
@@ -63,18 +63,6 @@ var Part = function(value) {
         context.font="40px Georgia";
         context.fillText(this.value, this.posx - 20, this.posy + 10);
     };
-
-    function hitTest(mx,my) {
-        
-        var dx;
-        var dy;
-        dx = mx - this.posx;
-        dy = my - this.posy;
-        
-        //a "hit" will be registered if the distance away from the center is less than the radius of the circular object        
-        return (dx*dx + dy*dy < this.raius*this.radius);
-    }
-
 };
 
 
@@ -85,11 +73,11 @@ var GameSession = function() {
 
     var theCanvas = document.getElementById("myCanvas");
     var bRect = theCanvas.getBoundingClientRect();
-
     var number_of_parts;
     var parts;
     var target;
     var context = theCanvas.getContext("2d");
+    var dragging;
     var dragIndex;
     var dragHoldX;
     var dragHoldY;
@@ -136,10 +124,13 @@ var GameSession = function() {
 
         mouseX = (evt.clientX - bRect.left)*(theCanvas.width/bRect.width);
         mouseY = (evt.clientY - bRect.top)*(theCanvas.height/bRect.height);
-
+        dragging = false;
+        console.log(dragging)
         for (i=0; i < parts.length; i++) {
+            console.log(parts)
             if  (hitTest(parts[i], mouseX, mouseY)) {
                 dragging = true;
+		console.log(dragging);
                 if (i > highestIndex) {
                     //We will pay attention to the point on the object where the mouse is "holding" the object:
                     dragHoldX = mouseX - parts[i].posx;
@@ -166,14 +157,14 @@ var GameSession = function() {
         window.removeEventListener("mouseup", mouseUpListener, false);
 
         if (hitTest(target, mouseX, mouseY) && (target.partIds.indexOf(parts[dragIndex].id) < 0)) {
-            target.includePart(parts[dragIndex])
+            target.includePart(parts[dragIndex]);
             context.clearRect(0, 0, b.width, b.height);
             context.restore();
             target.draw();
             drawParts();
 
         } else if ( dragging === true && hitTest(target, mouseX,mouseY) === false && (target.partIds.indexOf(parts[dragIndex].id) > -1)) {
-            target.excludePart(parts[dragIndex])
+            target.excludePart(parts[dragIndex]);
             context.clearRect(0, 0, b.width, b.height);
             context.restore();
             target.draw();
