@@ -20,6 +20,7 @@ var Target = function(targetValue) {
         console.log(this.includedParts)
         console.log(this.partIds)
     };
+
     this.excludePart = function(part) {
         this.currentValue -= part.value;
         var index = this.partIds.indexOf(part.id);
@@ -163,10 +164,6 @@ var GameSession = function() {
 
         theCanvas.addEventListener("mousedown", mouseDownListener, false);
         window.removeEventListener("mouseup", mouseUpListener, false);
-        if (dragging) {
-            dragging = false;
-            window.removeEventListener("mousemove", mouseMoveListener, false);
-        };
 
         if (hitTest(target, mouseX, mouseY) && (target.partIds.indexOf(parts[dragIndex].id) < 0)) {
             target.includePart(parts[dragIndex])
@@ -175,13 +172,20 @@ var GameSession = function() {
             target.draw();
             drawParts();
 
-        } else if (hitTest(target, mouseX,mouseY) === false && (target.partIds.indexOf(parts[dragIndex].id) > -1)) {
+        } else if ( dragging === true && hitTest(target, mouseX,mouseY) === false && (target.partIds.indexOf(parts[dragIndex].id) > -1)) {
             target.excludePart(parts[dragIndex])
             context.clearRect(0, 0, b.width, b.height);
             context.restore();
             target.draw();
             drawParts();
         };
+        
+        if (dragging) {
+            dragging = false;
+            window.removeEventListener("mousemove", mouseMoveListener, false);
+        };
+
+
     }    
 
     function hitTest(shape,mx,my) {
@@ -236,9 +240,7 @@ var GameSession = function() {
 
 
     this.reset = function() {
-
-        var b = document.getElementById("myCanvas");
-        var context = b.getContext("2d");
+        this.init();
         context.clearRect(0, 0, b.width, b.height);
         context.restore();
         
