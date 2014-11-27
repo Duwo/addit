@@ -3,8 +3,6 @@
 
 
 var Target = function(targetValue) {
-
-
     this.targetValue = targetValue;
     this.currentValue = 0;
     this.includedParts = [];
@@ -13,24 +11,29 @@ var Target = function(targetValue) {
     this.radius = 100;
     this.partIds =[];
 
-    this.includePart = function(part) {
-        this.currentValue += part.value;
-        this.includedParts.push(part);
+    this.includePart = function(part, sign) {
+        if (sign === "add") {
+            this.currentValue += Math.abs(part.value);
+        } else if(sign === "sub") {
+            this.currentValue -= Math.abs(part.value);
+        }
+        this.includedParts.push([part, sign]);
         this.partIds.push(part.id);
-        console.log(this.includedParts)
-        console.log(this.partIds)
     };
 
     this.excludePart = function(part) {
-        this.currentValue -= part.value;
         var index = this.partIds.indexOf(part.id);
+        sign = this.includedParts[index][1]
+        if (sign === "add") {
+            this.currentValue -= Math.abs(part.value);
+        } else if(sign === "sub") {
+            this.currentValue += Math.abs(part.value);
+        }
         if (index > -1) {
             this.partIds.splice(index, 1);
             this.includedParts.splice(index, 1);
 
         };
-        console.log(this.includedParts);
-        console.log(this.partIds);
     };
 
     this.draw = function() {
@@ -52,7 +55,6 @@ var Part = function(value) {
     this.posy = 100;
     this.radius = 30;
     this.id = idCounter++;
-    console.log(idCounter);
 
 
     this.draw = function() {
@@ -60,8 +62,8 @@ var Part = function(value) {
         context.beginPath();
         context.arc(this.posx, this.posy, this.radius,0,2*Math.PI);
         context.stroke();
-        context.font="40px Georgia";
-        context.fillText(this.value, this.posx - 20, this.posy + 10);
+        context.font="20px Georgia";
+        context.fillText(Math.abs(this.value), this.posx - 20, this.posy + 10);
     };
 };
 
@@ -81,19 +83,62 @@ var GameSession = function() {
     var dragIndex;
     var dragHoldX;
     var dragHoldY;
+    var add = false;  
+    var sub = false;
+    this.addition = function () {
+        if(add === false){
+             sub = false;
+             add = true;
+             document.getElementById("additionButton").style.background="rgba(255,0,0,0.6)"
+             document.getElementById("subtractionButton").style.background="#D3D3D3"
+        } else if (add === true){
+             add = false;
+             document.getElementById("additionButton").style.background="#D3D3D3"
+        }
+    }
+    this.subtraction = function () {
+        if(sub === false){
+             add = false;
+             sub = true;
+             document.getElementById("subtractionButton").style.background="rgba(255,0,0,0.6)"
+             document.getElementById("additionButton").style.background="#D3D3D3"
+        } else if (sub === true){
+             sub = false;
+             document.getElementById("subtractionButton").style.background="#D3D3D3"
+
+        }
+    }
+    this.get_sign = function () {
+        if (add === true) {
+           return "add"
+        } else if (sub === true) {
+           return "sub"
+        }
+    }
 
     this.init = function() {
 
         //later in make target function
-        target = new Target(100);
+        target = new Target(0);
         parts = [];
-
+        level = 4;
+        var sum = target.targetValue;
+        for (var i=0;i<4;i++) {
+           var partValue = Math.floor((Math.random() - 0.5) * 200)
+           sum += partValue;
+           parts[i] = new Part(partValue);
+        }
+        var lastPartValue = target.targetValue - sum;
+        //var part1Value = Math.floor((Math.random() - 0.5) * 200);
+        //var part2Value = Math.floor((Math.random() - 0.5) * 200);
+        //var part3Value = target.targetValue - part1Value - part2Value;
+        //var part1 = new Part(part1Value);
+        //var part2 = new Part(part2Value);
+        //var part3 = new Part(part3Value);
+        //parts.push(part1);
+        //parts.push(part2);
+        //parts.push(part3);
         // Later in make parts function
-        var part1 = new Part(50);
-        var part2 = new Part(50);
-
-        parts.push(part1);
-        parts.push(part2);
 
         target.draw(); 
  
@@ -125,12 +170,9 @@ var GameSession = function() {
         mouseX = (evt.clientX - bRect.left)*(theCanvas.width/bRect.width);
         mouseY = (evt.clientY - bRect.top)*(theCanvas.height/bRect.height);
         dragging = false;
-        console.log(dragging)
         for (i=0; i < parts.length; i++) {
-            console.log(parts)
             if  (hitTest(parts[i], mouseX, mouseY)) {
                 dragging = true;
-		console.log(dragging);
                 if (i > highestIndex) {
                     //We will pay attention to the point on the object where the mouse is "holding" the object:
                     dragHoldX = mouseX - parts[i].posx;
@@ -157,7 +199,7 @@ var GameSession = function() {
         window.removeEventListener("mouseup", mouseUpListener, false);
 
         if (hitTest(target, mouseX, mouseY) && (target.partIds.indexOf(parts[dragIndex].id) < 0)) {
-            target.includePart(parts[dragIndex]);
+            target.includePart(parts[dragIndex], gamesession.get_sign());
             context.clearRect(0, 0, b.width, b.height);
             context.restore();
             target.draw();
@@ -175,9 +217,8 @@ var GameSession = function() {
             dragging = false;
             window.removeEventListener("mousemove", mouseMoveListener, false);
         };
-
-
-    }    
+        completed();
+    };
 
     function hitTest(shape,mx,my) {
         
@@ -231,22 +272,22 @@ var GameSession = function() {
 
 
     this.reset = function() {
+        idCounter = 0;
         this.init();
         context.clearRect(0, 0, b.width, b.height);
         context.restore();
         
         this.parts = [];
     };
-
-
-
-    this.complete = function() {
-
+    function completed() {
+        if (target.includedParts.length === parts.length 
+            && target.currentValue === target.targetValue) {
+           alert("You Got it")
+        };
 
     };
-
-
 };
+
 var b = document.getElementById("myCanvas");
 var context = b.getContext("2d");
 
