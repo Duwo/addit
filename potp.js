@@ -83,8 +83,10 @@ var GameSession = function() {
     var dragIndex;
     var dragHoldX;
     var dragHoldY;
+    var level = 0;
     var add = false;  
     var sub = false;
+
     this.addition = function () {
         if(add === false){
              sub = false;
@@ -116,30 +118,26 @@ var GameSession = function() {
         }
     }
 
-    this.init = function() {
+    function init() {
 
         //later in make target function
-        target = new Target(0);
+        //target = new Target(10);
         parts = [];
-        level = 4;
-        var sum = target.targetValue;
-        for (var i=0;i<4;i++) {
-           var partValue = Math.floor((Math.random() - 0.5) * 200)
-           sum += partValue;
+        level++;
+        var sumParts = 0;
+        for (var i=0;i<level-1;i++) {
+           var partValue = Math.floor((Math.random() - 0.5) * 10)
+           sumParts += partValue;
+           var value = target.targetValue - partValue
+           console.log(value)
+           console.log("----------------------")
            parts[i] = new Part(partValue);
+           console.log(sumParts)
         }
-        var lastPartValue = target.targetValue - sum;
-        //var part1Value = Math.floor((Math.random() - 0.5) * 200);
-        //var part2Value = Math.floor((Math.random() - 0.5) * 200);
-        //var part3Value = target.targetValue - part1Value - part2Value;
-        //var part1 = new Part(part1Value);
-        //var part2 = new Part(part2Value);
-        //var part3 = new Part(part3Value);
-        //parts.push(part1);
-        //parts.push(part2);
-        //parts.push(part3);
-        // Later in make parts function
-
+        var offSet = 10;
+        lastValue = offSet - sumParts;
+        parts[level-1] = new Part(offSet - sumParts);
+        target = new Target(offSet)
         target.draw(); 
  
     };
@@ -148,10 +146,13 @@ var GameSession = function() {
             parts[i].draw();
         };
     };
-
-
+    function drawAll() {
+    }
+    //function newGame() {
     this.newGame = function() { 
         this.reset();
+        init();
+        drawAll();
         target.draw();
         drawParts();
 
@@ -182,9 +183,11 @@ var GameSession = function() {
                 }
             }
         }
+        console.log(dragging)
         
         if (dragging) {
-            window.addEventListener("mousemove", mouseMoveListener, false);
+            console.log("-----hello")
+            theCanvas.addEventListener("mousemove", mouseMoveListener, false);
         }
 
         theCanvas.removeEventListener("mousedown", mouseDownListener, false);
@@ -192,11 +195,13 @@ var GameSession = function() {
     }
 
     function mouseUpListener(evt) {
+        console.log("upping the mouse")
+    //this.mouseUpListener = function(evt) {
         mouseX = (evt.clientX - bRect.left)*(theCanvas.width/bRect.width);
         mouseY = (evt.clientY - bRect.top)*(theCanvas.height/bRect.height);
 
         theCanvas.addEventListener("mousedown", mouseDownListener, false);
-        window.removeEventListener("mouseup", mouseUpListener, false);
+        theCanvas.removeEventListener("mouseup", mouseUpListener, false);
 
         if (hitTest(target, mouseX, mouseY) && (target.partIds.indexOf(parts[dragIndex].id) < 0)) {
             target.includePart(parts[dragIndex], gamesession.get_sign());
@@ -215,7 +220,7 @@ var GameSession = function() {
         
         if (dragging) {
             dragging = false;
-            window.removeEventListener("mousemove", mouseMoveListener, false);
+            theCanvas.removeEventListener("mousemove", mouseMoveListener, false);
         };
         completed();
     };
@@ -231,6 +236,7 @@ var GameSession = function() {
         return (dx*dx + dy*dy < shape.radius*shape.radius);
     };
 
+    //this.mouseMoveListener = function(evt) {
     function mouseMoveListener(evt) {
         var posX;
         var posY;
@@ -252,7 +258,6 @@ var GameSession = function() {
             
         parts[dragIndex].posx = posX;
         parts[dragIndex].posy = posY;
-
         context.clearRect(0, 0, b.width, b.height);
         context.restore();
         target.draw();
@@ -273,7 +278,6 @@ var GameSession = function() {
 
     this.reset = function() {
         idCounter = 0;
-        this.init();
         context.clearRect(0, 0, b.width, b.height);
         context.restore();
         
@@ -282,7 +286,8 @@ var GameSession = function() {
     function completed() {
         if (target.includedParts.length === parts.length 
             && target.currentValue === target.targetValue) {
-           alert("You Got it")
+            alert("You Got it")
+            gamesession.newGame();
         };
 
     };
@@ -295,7 +300,7 @@ gamesession = new GameSession()
 
 
 
-document.getElementById("body").onload = function() {gamesession.init()};
+//document.getElementById("body").onload = function() {gamesession.init()};
 
 
 
