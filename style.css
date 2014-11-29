@@ -17,3 +17,8 @@
   border-color: black;
   z-index: -1;
 }
+
+#potp {
+top: 50px;
+text-align: center;
+}
