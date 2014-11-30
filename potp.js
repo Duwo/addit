@@ -1,15 +1,24 @@
 // Game implementation
             
 
+// Target object is the goald object
+/*
+in: 
+    targetValue  = int
 
+Description 
+
+
+*/
 var Target = function(targetValue) {
     this.targetValue = targetValue;
     this.currentValue = 0;
-    this.includedParts = [];
     this.posx = 250;
     this.posy = 250;
     this.radius = 100;
+    this.includedParts = [];
     this.partIds =[];
+    var color = getRandomColor();
 
     this.includePart = function(part, sign) {
         if (sign === "add") {
@@ -38,8 +47,14 @@ var Target = function(targetValue) {
 
     this.draw = function() {
         context.beginPath();
+
+        
         context.arc(this.posx, this.posy, this.radius,0,2*Math.PI);
+        context.fillStyle = color;
+        context.fill();
         context.stroke();
+
+        context.fillStyle = '#000000';
         context.font="40px Georgia";
         context.fillText(this.targetValue, this.posx - 30, this.posy - 10);
         context.font="40px Georgia";
@@ -55,61 +70,89 @@ var Part = function(value) {
     this.posy = 100;
     this.radius = 30;
     this.id = idCounter++;
-
+    var color = getRandomColor();
 
     this.draw = function() {
 
         context.beginPath();
         context.arc(this.posx, this.posy, this.radius,0,2*Math.PI);
+        context.fillStyle = color;
+        context.fill();
         context.stroke();
+        context.fillStyle = '#000000';
         context.font="20px Georgia";
         context.fillText(Math.abs(this.value), this.posx - 20, this.posy + 10);
     };
 };
 
-
+function getRandomColor() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 
 
 
 var GameSession = function() {
 
-    var theCanvas = document.getElementById("myCanvas");
-    var bRect = theCanvas.getBoundingClientRect();
+    var theCanvas   = document.getElementById("myCanvas");
+    var bRect       = theCanvas.getBoundingClientRect();
     var number_of_parts;
     var parts;
     var target;
-    var context = theCanvas.getContext("2d");
+    var context     = theCanvas.getContext("2d");
     var dragging;
     var dragIndex;
     var dragHoldX;
     var dragHoldY;
-    var level = 0;
-    var add = false;  
-    var sub = false;
+    var level       = 0;
+    var add         = false;  
+    var sub         = false;
+    var multi       = false;
 
     this.addition = function () {
         if(add === false){
-             sub = false;
-             add = true;
+             sub    = false;
+             multi  = false;
+             add    = true;
              document.getElementById("additionButton").style.background="rgba(255,0,0,0.6)"
              document.getElementById("subtractionButton").style.background="#D3D3D3"
+             document.getElementById("multiplicationButton").style.background="#D3D3D3"
         } else if (add === true){
-             add = false;
+             add    = false;
              document.getElementById("additionButton").style.background="#D3D3D3"
         }
     }
     this.subtraction = function () {
         if(sub === false){
-             add = false;
-             sub = true;
+             add    = false;
+             multi  = false;
+             sub    = true;
              document.getElementById("subtractionButton").style.background="rgba(255,0,0,0.6)"
              document.getElementById("additionButton").style.background="#D3D3D3"
+             document.getElementById("multiplicationButton").style.background="#D3D3D3"
         } else if (sub === true){
-             sub = false;
+             sub    = false;
              document.getElementById("subtractionButton").style.background="#D3D3D3"
 
         }
     }
+    this.multiplication = function () {
+        if(multi === false){
+             add    = false;
+             sub    = false;
+             multi  = true
+             document.getElementById("multiplicationButton").style.background="rgba(255,0,0,0.6)"
+             document.getElementById("subtractionButton").style.background="#D3D3D3"
+             document.getElementById("additionButton").style.background="#D3D3D3"
+        } else if (multi === true){
+             multi  = false;
+             document.getElementById("multiplicationButton").style.background="#D3D3D3"
+        }
+    }    
     this.get_sign = function () {
         if (add === true) {
            return "add"
@@ -126,18 +169,18 @@ var GameSession = function() {
         level++;
         var sumParts = 0;
         for (var i=0;i<level-1;i++) {
-           var partValue = Math.floor((Math.random() - 0.5) * 10)
-           sumParts += partValue;
-           var value = target.targetValue - partValue
-           console.log(value)
-           console.log("----------------------")
-           parts[i] = new Part(partValue);
-           console.log(sumParts)
-        }
-        var offSet = 10;
-        lastValue = offSet - sumParts;
-        parts[level-1] = new Part(offSet - sumParts);
-        target = new Target(offSet)
+            var partValue = Math.floor((Math.random() - 0.5) * 10)
+            shouldImultiply = Math.floor((Math.random) * 3)
+            //if (shouldImultiply === 1) {
+            //    sumParts = parts[i-1] * partValue  
+            //} else {
+            sumParts     += partValue;    
+            //}
+            parts[i]     = new Part(partValue);
+        };
+
+        //parts[level-1] = new Part(offSet - sumParts);
+        target = new Target(sumParts)
         target.draw(); 
  
     };
@@ -158,15 +201,12 @@ var GameSession = function() {
 
         theCanvas.addEventListener("mousedown", mouseDownListener, false);
     };
-
     function mouseDownListener(evt) {
         var i;
         //We are going to pay attention to the layering order of the objects so that if a mouse down occurs over more than object,
         //only the topmost one will be dragged. 
-
-        // THIS NEEDS TO CHANGE
         var highestIndex = -1;
-
+        dragIndex = -1;
 
         mouseX = (evt.clientX - bRect.left)*(theCanvas.width/bRect.width);
         mouseY = (evt.clientY - bRect.top)*(theCanvas.height/bRect.height);
@@ -183,10 +223,8 @@ var GameSession = function() {
                 }
             }
         }
-        console.log(dragging)
         
         if (dragging) {
-            console.log("-----hello")
             theCanvas.addEventListener("mousemove", mouseMoveListener, false);
         }
 
@@ -195,33 +233,36 @@ var GameSession = function() {
     }
 
     function mouseUpListener(evt) {
-        console.log("upping the mouse")
     //this.mouseUpListener = function(evt) {
         mouseX = (evt.clientX - bRect.left)*(theCanvas.width/bRect.width);
         mouseY = (evt.clientY - bRect.top)*(theCanvas.height/bRect.height);
 
-        theCanvas.addEventListener("mousedown", mouseDownListener, false);
+        
         theCanvas.removeEventListener("mouseup", mouseUpListener, false);
+        theCanvas.addEventListener("mousedown", mouseDownListener, false);
+        if (dragIndex >= 0){
+            if (hitTest(target, mouseX, mouseY) && (target.partIds.indexOf(parts[dragIndex].id) < 0)) {
+                target.includePart(parts[dragIndex], gamesession.get_sign());
+                context.clearRect(0, 0, b.width, b.height);
+                context.restore();
+                target.draw();
+                drawParts();
 
-        if (hitTest(target, mouseX, mouseY) && (target.partIds.indexOf(parts[dragIndex].id) < 0)) {
-            target.includePart(parts[dragIndex], gamesession.get_sign());
-            context.clearRect(0, 0, b.width, b.height);
-            context.restore();
-            target.draw();
-            drawParts();
-
-        } else if ( dragging === true && hitTest(target, mouseX,mouseY) === false && (target.partIds.indexOf(parts[dragIndex].id) > -1)) {
-            target.excludePart(parts[dragIndex]);
-            context.clearRect(0, 0, b.width, b.height);
-            context.restore();
-            target.draw();
-            drawParts();
+            } else if ( dragging === true && hitTest(target, mouseX,mouseY) === false && (target.partIds.indexOf(parts[dragIndex].id) > -1)) {
+                target.excludePart(parts[dragIndex]);
+                context.clearRect(0, 0, b.width, b.height);
+                context.restore();
+                target.draw();
+                drawParts();
+            };
         };
         
         if (dragging) {
             dragging = false;
             theCanvas.removeEventListener("mousemove", mouseMoveListener, false);
-        };
+        }
+        console.log("3")
+
         completed();
     };
 
