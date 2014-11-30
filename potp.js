@@ -174,15 +174,15 @@ var GameSession = function() {
         parts = [];
         level++;
         var sumParts = 0;
-        for (var i=0;i<level-1;i++) {
+        for (var i=0;i<level;i++) {
             var partValue = Math.floor((Math.random() * 10) + 1)
-            sign = Math.floor(Math.random() * 3)
-            if (sign === 1) {
+            sign = Math.round(Math.random() * 2)
+            if (sign === 0) {
                 console.log("hello")
                 sumParts += partValue
-            } else if (sign === 2){
+            } else if (sign === 1){
                 sumParts -= partValue
-            } else if (sign === 3) {
+            } else if (sign === 2) {
                 sumParts *= partValue
             }
             parts[i]     = new Part(partValue);
