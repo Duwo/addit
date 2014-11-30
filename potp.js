@@ -25,6 +25,8 @@ var Target = function(targetValue) {
             this.currentValue += Math.abs(part.value);
         } else if(sign === "sub") {
             this.currentValue -= Math.abs(part.value);
+        } else if(sign === "multi") {
+            this.currentValue *= Math.abs(part.value);
         }
         this.includedParts.push([part, sign]);
         this.partIds.push(part.id);
@@ -37,6 +39,8 @@ var Target = function(targetValue) {
             this.currentValue -= Math.abs(part.value);
         } else if(sign === "sub") {
             this.currentValue += Math.abs(part.value);
+        } else if(sign === "multi") {
+            this.currentValue /= Math.abs(part.value);
         }
         if (index > -1) {
             this.partIds.splice(index, 1);
@@ -158,6 +162,8 @@ var GameSession = function() {
            return "add"
         } else if (sub === true) {
            return "sub"
+        } else if (multi === true) {
+           return "multi"
         }
     }
 
@@ -169,13 +175,16 @@ var GameSession = function() {
         level++;
         var sumParts = 0;
         for (var i=0;i<level-1;i++) {
-            var partValue = Math.floor((Math.random() - 0.5) * 10)
-            shouldImultiply = Math.floor((Math.random) * 3)
-            //if (shouldImultiply === 1) {
-            //    sumParts = parts[i-1] * partValue  
-            //} else {
-            sumParts     += partValue;    
-            //}
+            var partValue = Math.floor((Math.random() * 10) + 1)
+            sign = Math.floor(Math.random() * 3)
+            if (sign === 1) {
+                console.log("hello")
+                sumParts += partValue
+            } else if (sign === 2){
+                sumParts -= partValue
+            } else if (sign === 3) {
+                sumParts *= partValue
+            }
             parts[i]     = new Part(partValue);
         };
 
@@ -321,7 +330,6 @@ var GameSession = function() {
         idCounter = 0;
         context.clearRect(0, 0, b.width, b.height);
         context.restore();
-        
         this.parts = [];
     };
     function completed() {
