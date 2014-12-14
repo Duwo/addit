@@ -12,7 +12,7 @@ Description
 */
 var Target = function(targetValue) {
     this.targetValue = targetValue;
-    this.currentValue = 0;
+    this.currentValue = 1;
     this.posx = 250;
     this.posy = 250;
     this.radius = 100;
@@ -173,16 +173,21 @@ var GameSession = function() {
         //target = new Target(10);
         parts = [];
         level++;
-        var sumParts = 0;
+        var sumParts = 1;
         for (var i=0;i<level;i++) {
             var partValue = Math.floor((Math.random() * 10) + 1)
             sign = Math.round(Math.random() * 2)
             if (sign === 0) {
-                console.log("hello")
+                console.log("+")
+                console.log(partValue)
                 sumParts += partValue
             } else if (sign === 1){
+                console.log("-")
+                console.log(partValue)
                 sumParts -= partValue
             } else if (sign === 2) {
+                console.log("*")
+                console.log(partValue)
                 sumParts *= partValue
             }
             parts[i]     = new Part(partValue);
@@ -270,7 +275,6 @@ var GameSession = function() {
             dragging = false;
             theCanvas.removeEventListener("mousemove", mouseMoveListener, false);
         }
-        console.log("3")
 
         completed();
     };
