@@ -39,13 +39,10 @@ var Target = function(targetValue) {
 
     this.draw = function() {
         context.beginPath();
-
-        
         context.arc(this.posx, this.posy, this.radius,0,2*Math.PI);
         context.fillStyle = color;
         context.fill();
         context.stroke();
-
         context.fillStyle = '#000000';
         context.font="40px Georgia";
         context.fillText(this.targetValue, this.posx - 30, this.posy - 10);
@@ -53,3 +50,10 @@ var Target = function(targetValue) {
         context.fillText(this.currentValue, this.posx - 30, this.posy + 20);
     };
 };
+
+try {
+  module.exports = Target
+}
+catch(err) {
+  console.log(err)
+}

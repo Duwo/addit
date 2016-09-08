@@ -1,0 +1,19 @@
+{
+  "name": "Target Me",
+  "description": "Math game",
+  "main": "",
+  "authors": [
+    "Erik Rodhe"
+  ],
+  "license": "MIT",
+  "homepage": "erikrodhe.com",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "jquery": "^3.0.0"
+  },
+  "devDependencies": {
+    "browserify" : "^13.1.0",
+    "uglify-js" : "^2.7.1"
+  }
+}
