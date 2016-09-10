@@ -6,7 +6,7 @@ var Target = function(targetValue) {
     this.radius = 100;
     this.includedParts = [];
     this.partIds =[];
-    var color = getRandomColor();
+    this.color = getRandomColor();
 
     this.includePart = function(part, sign) {
         if (sign === "add") {
@@ -40,7 +40,7 @@ var Target = function(targetValue) {
     this.draw = function() {
         context.beginPath();
         context.arc(this.posx, this.posy, this.radius,0,2*Math.PI);
-        context.fillStyle = color;
+        context.fillStyle = this.color;
         context.fill();
         context.stroke();
         context.fillStyle = '#000000';

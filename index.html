@@ -6,26 +6,27 @@
         <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
         <meta content="utf-8" http-equiv="encoding">
         <link rel="stylesheet" type="text/css" href="css/style.css" />
+        <script type="text/javascript" src='./node_modules/jquery/dist/jquery.min.js'></script>
     </head>
     <body id="body">
     <div id="potp">
         <canvas id="myCanvas" width="500" height="500" style="border:4px solid #d3d3d3; background-color: #FFFFCC">
         Your browser does not support the HTML5 canvas tag.</canvas>
         <div>
-            <button onClick="gamesession.newGame()">
+            <button onClick="GameSession.newGame()">
                 <img src="images/startbutton.png" width="50" /> 
                 Go!
             </button>
             <button id="additionButton"> 
-                <img src="images/addition.gif" width="50" onClick="gamesession.switch_sign('add')" /> 
+                <img src="images/addition.gif" width="50" onClick="GameSession.switch_sign('add')" /> 
                 ADD  
             </button>
            <button id="subtractionButton" > 
-                <img src="images/Subtraction.jpg" width="50" onClick="gamesession.switch_sign('subtraction')" /> 
+                <img src="images/Subtraction.jpg" width="50" onClick="GameSession.switch_sign('subtraction')" /> 
                 SUB  
             </button>
             <button id="multiplicationButton" > 
-                <img src="images/Subtraction.jpg" width="50" onClick="gamesession.switch_sign('multiplication')" /> 
+                <img src="images/Subtraction.jpg" width="50" onClick="GameSession.switch_sign('multiplication')" /> 
                 MULTI  
             </button>
         </div>
