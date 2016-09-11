@@ -1,39 +1,40 @@
-var Target = function(targetValue) {
+//var Target = function(targetValue) {
+function Target(targetValue) {
     this.targetValue = targetValue;
     this.currentValue = 1;
-    this.posx = 250;
-    this.posy = 250;
-    this.radius = 100;
-    this.includedParts = [];
-    this.partIds =[];
+    this.posx = canvas.width/2;
+    this.posy = canvas.width/2;
+    this.radius = canvas.width/6;
+    this.parts = [];
+    this.signs = [];
     this.color = getRandomColor();
 
     this.includePart = function(part, sign) {
+        console.log(part)
         if (sign === "add") {
             this.currentValue += Math.abs(part.value);
-        } else if(sign === "sub") {
+        } else if(sign === "subtraction") {
             this.currentValue -= Math.abs(part.value);
-        } else if(sign === "multi") {
+        } else if(sign === "multiplication") {
             this.currentValue *= Math.abs(part.value);
         }
-        this.includedParts.push([part, sign]);
-        this.partIds.push(part.id);
+        this.parts.push(part);
+        this.signs.push(sign);
     };
 
     this.excludePart = function(part) {
-        var index = this.partIds.indexOf(part.id);
-        sign = this.includedParts[index][1]
+        index = this.parts.indexOf(part);        
+        sign = this.signs[index]
         if (sign === "add") {
             this.currentValue -= Math.abs(part.value);
-        } else if(sign === "sub") {
+        } else if(sign === "subtraction") {
             this.currentValue += Math.abs(part.value);
-        } else if(sign === "multi") {
+        } else if(sign === "multiplication") {
             this.currentValue /= Math.abs(part.value);
         }
         if (index > -1) {
-            this.partIds.splice(index, 1);
-            this.includedParts.splice(index, 1);
-
+            this.parts.splice(index, 1);
+            this.signs.splice(index, 1);
         };
     };
 
@@ -44,10 +45,9 @@ var Target = function(targetValue) {
         context.fill();
         context.stroke();
         context.fillStyle = '#000000';
-        context.font="40px Georgia";
-        context.fillText(this.targetValue, this.posx - 30, this.posy - 10);
-        context.font="40px Georgia";
-        context.fillText(this.currentValue, this.posx - 30, this.posy + 20);
+        context.font = canvas.width/10 + "px Georgia";
+        context.fillText(this.targetValue, this.posx - canvas.width/20, this.posy - canvas.width/30);
+        context.fillText(this.currentValue, this.posx - canvas.width/20, this.posy + canvas.width/10);
     };
 };
 

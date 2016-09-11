@@ -5,85 +5,84 @@ catch(err) {
   console.log(err)
 }
 
-var canvas = document.getElementById("myCanvas")
+var canvas  = document.getElementById("myCanvas")
 var context = canvas.getContext("2d");
-var bRect       = canvas.getBoundingClientRect();
+var bRect   = canvas.getBoundingClientRect();
 
-var dragging;
-var dragIndex;
-var isDown = false;
-
-var x1;
+var dragging = false;
+var activePart;
 document.getElementById("body").onload = function() {GameSession.init()};
-canvas.addEventListener("mousedown", mouseDownListener, false);
 
+canvas.addEventListener("mousedown", mouseDownListener, false);
+window.addEventListener( 'resize', onWindowResize, false );
+
+function onWindowResize(){
+    canvas.addEventListener("mousedown", mouseDownListener, false);
+    context = canvas.getContext("2d");
+    bRect   = canvas.getBoundingClientRect();
+    GameSession.update();
+}
 
 function mouseDownListener(evt) {
-    console.log("xdsd")
-    var i;
     //We are going to pay attention to the layering 
     //order of the objects so that if a mouse down occurs over more than object,
     //only the topmost one will be dragged. 
-    var highestIndex = -1;
-    dragIndex = -1;
-
     mouseX = (evt.clientX - bRect.left)*(canvas.width/bRect.width);
     mouseY = (evt.clientY - bRect.top)*(canvas.height/bRect.height);
     dragging = false;
-    canvas.addEventListener("mousedown", mouseUpListener, false);
-    for (i=0; i < GameSession.parts.length; i++) {
-        if  (hitTest(GameSession.parts[i], mouseX, mouseY)) {
-            console.log("hello")
+    canvas.addEventListener("mouseup", mouseUpListener, false);
+    for (var i in GameSession.parts) {
+        if (hitTest(GameSession.parts[i], mouseX, mouseY)) {
             dragging = true;
-            if (i > highestIndex) {
-                //We will pay attention to the point on the object where the mouse is "holding" the object:
-                dragHoldX = mouseX - GameSession.parts[i].posx;
-                dragHoldY = mouseY - GameSession.parts[i].posy;
-                highestIndex = i;
-                dragIndex = i;
-            }
+            //We will pay attention to the point on the object where the mouse is "holding" the object:
+            dragHoldX = mouseX - GameSession.parts[i].posx;
+            dragHoldY = mouseY - GameSession.parts[i].posy;
+            activePart = GameSession.parts[i];
         }
     }
-    
     if (dragging) {
         canvas.addEventListener("mousemove", mouseMoveListener, false);
     }
 }
 
-function mouseUpListener(evt) {
+function contains(arr, obj) {
+    for (var i = 0; i < arr.length; i++) {
+        if (arr[i] === obj) {
+            return true;
+        }
+    }
+    return false;
+}
 
-    console.log("hehe2")
-    console.log(dragging)
+function mouseUpListener(evt) { 
     mouseX = (evt.clientX - bRect.left)*(canvas.width/bRect.width);
     mouseY = (evt.clientY - bRect.top)*(canvas.height/bRect.height);
     canvas.removeEventListener("mouseup", mouseUpListener, false);
     canvas.addEventListener("mousedown", mouseDownListener, false);
-    if (dragIndex >= 0){
-        if (hitTest(GameSession.target, mouseX, mouseY) && (GameSession.target.partIds.indexOf(GameSession.parts[dragIndex].id) < 0)) {
-            GameSession.target.includePart(GameSession.parts[dragIndex], GameSession.sign);
-            GameSession.update();
-        } else if ( dragging === true && hitTest(GameSession.target, mouseX,mouseY) === false && (GameSession.target.partIds.indexOf(GameSession.parts[dragIndex].id) > -1)) {
-            GameSession.target.excludePart(GameSession.parts[dragIndex]);
-            GameSession.update();
-        };
+    if (dragging) {
+        if (hitTest(GameSession.target, mouseX, mouseY) 
+            && !contains(GameSession.target.parts, activePart)) {
+            GameSession.target.includePart(activePart, GameSession.sign);
+        } else if (!hitTest(GameSession.target, mouseX,mouseY) 
+            && contains(GameSession.target.parts, activePart)) {
+            GameSession.target.excludePart(activePart);
+        };        
     };
     if (dragging) {
         dragging = false;
         canvas.removeEventListener("mousemove", mouseMoveListener, false);
     }
+    GameSession.update();
 };
 
 
 function mouseMoveListener(evt) {
-    var posX;
-    var posY;
-    var partRad = GameSession.parts[dragIndex].radius;
-    var minX = partRad;
-    var maxX = canvas.width - partRad;
-    var minY = partRad;
-    var maxY = canvas.height - partRad;
+    partRad = activePart.radius;
+    minX = partRad;
+    maxX = canvas.width - partRad;
+    minY = partRad;
+    maxY = canvas.height - partRad;
     //getting mouse position correctly 
-    var bRect = canvas.getBoundingClientRect();
     mouseX = (evt.clientX - bRect.left)*(canvas.width/bRect.width);
     mouseY = (evt.clientY - bRect.top)*(canvas.height/bRect.height);
         
@@ -92,11 +91,12 @@ function mouseMoveListener(evt) {
     posX = (posX < minX) ? minX : ((posX > maxX) ? maxX : posX);
     posY = mouseY - dragHoldY;
     posY = (posY < minY) ? minY : ((posY > maxY) ? maxY : posY);
-        
-    GameSession.parts[dragIndex].posx = posX;
-    GameSession.parts[dragIndex].posy = posY;
+    activePart.posx = posX;
+    activePart.posy = posY;
     GameSession.update();
 };
+
+
 /*
 $('#myCanvas').on('mousedown', function(e){
 

@@ -12,8 +12,6 @@ catch(err) {
   console.log(err)
 }
 
-var idCounter = 0;
-
 GameSession.init = function() {
     this.level++;
     sumParts = 1;
@@ -21,12 +19,8 @@ GameSession.init = function() {
         var partValue = Math.floor((Math.random() * 10) + 1)
         sign = Math.round(Math.random() * 2)
         if (sign === 0) {
-            console.log("+")
-            console.log(partValue)
             sumParts += partValue
         } else if (sign === 1){
-            console.log("-")
-            console.log(partValue)
             sumParts -= partValue
         } else if (sign === 2) {
             console.log("*")
@@ -39,22 +33,23 @@ GameSession.init = function() {
     this.update();
 };
 
-GameSession.switch_sign = function (sign) {
-    this.sign = sign
+GameSession.switch_sign = function(el, sign) {
+    GameSession.sign = sign
+    $(".signs").css('backgroundColor','white')
+    $(el).css('backgroundColor','red')
 }
 
 GameSession.reset = function() {
-    idCounter = 0;
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.restore();
     this.parts = [];
 };
 
 GameSession.completed = function() {
-    if (this.target.includedParts.length === this.parts.length 
+    if (this.target.parts.length === this.parts.length 
         && this.target.currentValue === this.target.targetValue) {
         alert("You Got it")
-        gamesession.newGame();
+        this.newGame();
     };
 };
 
@@ -71,9 +66,7 @@ GameSession.update = function() {
 GameSession.newGame = function() { 
     this.reset();
     this.init();
-    this.update();
 };
-
 
 function getRandomColor () {
     letters = '0123456789ABCDEF'.split('');
@@ -85,13 +78,10 @@ function getRandomColor () {
 };
 
 function hitTest(shape, mx, my) {
-    console.log("xxxx122")
-    var dx;
-    var dy;
     dx = mx - shape.posx;
     dy = my - shape.posy;
-    
-    //a "hit" will be registered if the distance away from the center is less than the radius of the circular object        
+    //a "hit" will be registered if the distance away 
+    // from the center is less than the radius of the circular object        
     return (dx*dx + dy*dy < shape.radius*shape.radius);
 };
 

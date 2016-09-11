@@ -1,9 +1,8 @@
 function Part (value) {
     this.value = value;
-    this.posx = 50+ Math.random()*300;
-    this.posy = 100;
-    this.radius = 30;
-    this.id = idCounter++;
+    this.posx =  canvas.width/10 + Math.random()*canvas.width/2;
+    this.posy = canvas.height/6;
+    this.radius = canvas.width/20;
     this.color = getRandomColor();
 
     this.draw = function() {
@@ -13,8 +12,8 @@ function Part (value) {
         context.fill();
         context.stroke();
         context.fillStyle = '#000000';
-        context.font="20px Georgia";
-        context.fillText(Math.abs(this.value), this.posx - 20, this.posy + 10);
+        context.font= canvas.width/20 + "px Georgia";
+        context.fillText(Math.abs(this.value), this.posx - canvas.width/30, this.posy + canvas.width/50);
     };
 };
 
