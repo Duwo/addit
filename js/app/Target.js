@@ -1,5 +1,11 @@
-//var Target = function(targetValue) {
-function Target(targetValue) {
+try {
+  var helper = require('../lib/helper.js')
+}
+catch(err) {
+  console.log(err)
+}
+
+function Target(canvas, targetValue) {
     this.targetValue = targetValue;
     this.currentValue = 1;
     this.posx = canvas.width/2;
@@ -7,15 +13,14 @@ function Target(targetValue) {
     this.radius = canvas.width/6;
     this.parts = [];
     this.signs = [];
-    this.color = getRandomColor();
+    this.color = helper.getRandomColor();
 
     this.includePart = function(part, sign) {
-        console.log(part)
-        if (sign === "add") {
+        if (sign === "+") {
             this.currentValue += Math.abs(part.value);
-        } else if(sign === "subtraction") {
+        } else if(sign === "-") {
             this.currentValue -= Math.abs(part.value);
-        } else if(sign === "multiplication") {
+        } else if(sign === "*") {
             this.currentValue *= Math.abs(part.value);
         }
         this.parts.push(part);
@@ -25,11 +30,11 @@ function Target(targetValue) {
     this.excludePart = function(part) {
         index = this.parts.indexOf(part);        
         sign = this.signs[index]
-        if (sign === "add") {
+        if (sign === "+") {
             this.currentValue -= Math.abs(part.value);
-        } else if(sign === "subtraction") {
+        } else if(sign === "-") {
             this.currentValue += Math.abs(part.value);
-        } else if(sign === "multiplication") {
+        } else if(sign === "*") {
             this.currentValue /= Math.abs(part.value);
         }
         if (index > -1) {
@@ -38,7 +43,7 @@ function Target(targetValue) {
         };
     };
 
-    this.draw = function() {
+    this.draw = function(context) {
         context.beginPath();
         context.arc(this.posx, this.posy, this.radius,0,2*Math.PI);
         context.fillStyle = this.color;

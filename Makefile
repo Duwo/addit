@@ -5,7 +5,7 @@ dev:
 	npm install
 
 clean:
-	rm dist/starsystem.js dist/starsystem.min.js
+	rm dist/potp.js dist/potp.min.js
 
 build:
 	browserify js/main.js -o dist/potp.js 
