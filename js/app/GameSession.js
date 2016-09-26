@@ -3,20 +3,20 @@ GameSession.parts   = [];
 GameSession.target;
 GameSession.level   = 0;
 GameSession.sign;
-GameSession.canvas  = document.getElementById("myCanvas")
-GameSession.context = GameSession.canvas.getContext("2d");
-GameSession.bRect   = GameSession.canvas.getBoundingClientRect();
 
 try {
   var Part = require('./Part.js');
   var Target = require('./Target.js');
+  var helper = require('../lib/helper.js')
 }
 catch(err) {
   console.log(err)
 }
 
-GameSession.init = function() {
-    this.canvas.addEventListener("mousedown", mouseDownListener, false);
+GameSession.init = function(canvas) {
+    GameSession.canvas  = canvas
+    GameSession.context = GameSession.canvas.getContext("2d");
+    GameSession.bRect   = GameSession.canvas.getBoundingClientRect();
     this.reset();
     this.nextLevel();
 };
@@ -70,9 +70,10 @@ GameSession.completed = function() {
 GameSession.update = function() {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.context.restore();
+    this.context = $('#myCanvas')[0].getContext("2d");
     this.target.draw(this.context);
-    for (i = 0; i < this.parts.length; i++) { 
-      this.parts[i].draw(this.context);
+    for (i = 0; i < this.parts.length; i++) {
+        this.parts[i].draw(this.context);
     };
 };
 

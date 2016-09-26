@@ -37,7 +37,22 @@ var helper = {
       sumParts *= partValue
     }
     return partValue, sumParts
-  }      
+  },
+  convertMouse: function(evt, canvas) {
+    if (evt.pageX || evt.pageY) { 
+      x = evt.offsetX;
+      y = evt.offsetY;
+    }
+    else { 
+      x = evt.clientX + document.body.scrollLeft + document.documentElement.scrollLeft; 
+      y = evt.clientY + document.body.scrollTop + document.documentElement.scrollTop; 
+    }
+    console.log('PageX: '+evt.pageX)
+    console.log('PageX: '+evt.pageX)
+    //x -= canvas.offsetLeft;
+    //y -= canvas.offsetTop;
+    return [x, y]
+  }
 };
 
 try {

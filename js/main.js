@@ -8,20 +8,88 @@ catch(err) {
 
 var dragging = false;
 var activePart;
+var mouse
 
-$("document").ready(function() {GameSession.init()});
+canvas = $('<canvas>',
+    {
+        id: 'myCanvas',
+        class: '',
+    });
+canvas[0].width = 400
+canvas[0].height= 400
 
+button1 = $('<button>',
+    {
+        id:'myBtn',
+        onClick: 'GameSession.nextLevel()',
+        text:'New'
+    }
+);
+button1.append('<img width="50" src="./images/startbutton.png"/>')
+
+button2 = $('<button>',
+    {
+        id:'additionButton',
+        class: 'signs',
+        onClick:"GameSession.switch_sign($(this),'+')",
+    }
+);
+button2.append('<img width="50" src="./images/addition.gif"/>')
+
+button3 = $('<button>',
+    {
+        id:'subtractionButton',
+        class: 'signs',
+        onClick:"GameSession.switch_sign($(this),'-')",
+    }
+);
+button3.append('<img width="50" src="./images/Subtraction.jpg"/>')
+
+button4 = $('<button>',
+    {
+        id:'multiplicationButton',
+        class: 'signs',
+        onClick:"GameSession.switch_sign($(this),'*')",
+    }
+);
+button4.append('<img width="50" src="./images/multiply.png"/>')
+$("#content").append(canvas)
+
+buttons = $('<div>',
+    {
+        id: 'buttons',
+        class: ''
+    });
+$("#content").append(buttons)
+buttons.append(button1)
+buttons.append(button2)
+buttons.append(button3)
+buttons.append(button4)
+// Get Dom element for pure javascript
+var canvas = canvas[0]
+$("document").ready(function() {GameSession.init(canvas)});
+
+canvas.addEventListener("mousedown", mouseDownListener, false);
 window.addEventListener( 'resize', onWindowResize, false );
 function onWindowResize(){
     GameSession.update();
 }
+$(window).scroll(function() {
+    GameSession.update()
+});
+
 
 function mouseDownListener(evt) {
+    console.log('MouseEvent:'+helper.convertMouse(evt, canvas))
+    console.log('PartX:'+ GameSession.parts[0].posx)
+    console.log('PartY:'+ GameSession.parts[0].posy)
+
     //We are going to pay attention to the layering 
     //order of the objects so that if a mouse down occurs over more than object,
     //only the topmost one will be dragged. 
-    mouseX = (evt.clientX - GameSession.bRect.left)*(GameSession.canvas.width/GameSession.bRect.width);
-    mouseY = (evt.clientY - GameSession.bRect.top)*(GameSession.canvas.height/GameSession.bRect.height);
+    var mouse = helper.convertMouse(evt, canvas);
+    mouseX = mouse[0]
+    mouseY = mouse[1]
     dragging = false;
     GameSession.canvas.addEventListener("mouseup", mouseUpListener, false);
     for (i in GameSession.parts) {
@@ -39,12 +107,13 @@ function mouseDownListener(evt) {
 }
 
 function mouseUpListener(evt) { 
-    mouseX = (evt.clientX - GameSession.bRect.left)*(GameSession.canvas.width/GameSession.bRect.width);
-    mouseY = (evt.clientY - GameSession.bRect.top)*(GameSession.canvas.height/GameSession.bRect.height);
+    var mouse = helper.convertMouse(evt, canvas);
+    mouseX = mouse[0]
+    mouseY = mouse[1]
     GameSession.canvas.removeEventListener("mouseup", mouseUpListener, false);
     GameSession.canvas.addEventListener("mousedown", mouseDownListener, false);
     
-    if (!helper.contains(GameSession.target.parts, activePart)) {
+    if (activePart && !helper.contains(GameSession.target.parts, activePart)) {
         activePart.sign = ''
     };
     activePart = 0;
@@ -57,6 +126,11 @@ function mouseUpListener(evt) {
 };
 
 function mouseMoveListener(evt) {
+    //getting mouse position correctly
+    var mouse = helper.convertMouse(evt, canvas);
+    mouseX = mouse[0]
+    mouseY = mouse[1]
+
     if (dragging) {
         if (helper.hitTest(GameSession.target, mouseX, mouseY) 
             && !helper.contains(GameSession.target.parts, activePart)) {
@@ -71,18 +145,18 @@ function mouseMoveListener(evt) {
     maxX = GameSession.canvas.width - partRad;
     minY = partRad;
     maxY = GameSession.canvas.height - partRad;
-    //getting mouse position correctly 
-    mouseX = (evt.clientX - GameSession.bRect.left)*(GameSession.canvas.width/GameSession.bRect.width);
-    mouseY = (evt.clientY - GameSession.bRect.top)*(GameSession.canvas.height/GameSession.bRect.height);
-        
     //clamp x and y positions to prevent object from dragging outside of GameSession.canvas
-    posX = mouseX - dragHoldX;
+    posX = mouseX;
+    console.log('MouseX' + mouseX)
     posX = (posX < minX) ? minX : ((posX > maxX) ? maxX : posX);
-    posY = mouseY - dragHoldY;
+    console.log('posX' + posX)
+
+    posY = mouseY;
+    
     posY = (posY < minY) ? minY : ((posY > maxY) ? maxY : posY);
     activePart.posx = posX;
     activePart.posy = posY;
-    activePart.sign = GameSession.sign
+    activePart.sign = GameSession.sign || ''
     GameSession.update();
 };
 

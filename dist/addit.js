@@ -4,20 +4,20 @@ GameSession.parts   = [];
 GameSession.target;
 GameSession.level   = 0;
 GameSession.sign;
-GameSession.canvas  = document.getElementById("myCanvas")
-GameSession.context = GameSession.canvas.getContext("2d");
-GameSession.bRect   = GameSession.canvas.getBoundingClientRect();
 
 try {
   var Part = require('./Part.js');
   var Target = require('./Target.js');
+  var helper = require('../lib/helper.js')
 }
 catch(err) {
   console.log(err)
 }
 
-GameSession.init = function() {
-    this.canvas.addEventListener("mousedown", mouseDownListener, false);
+GameSession.init = function(canvas) {
+    GameSession.canvas  = canvas
+    GameSession.context = GameSession.canvas.getContext("2d");
+    GameSession.bRect   = GameSession.canvas.getBoundingClientRect();
     this.reset();
     this.nextLevel();
 };
@@ -71,9 +71,10 @@ GameSession.completed = function() {
 GameSession.update = function() {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.context.restore();
+    this.context = $('#myCanvas')[0].getContext("2d");
     this.target.draw(this.context);
-    for (i = 0; i < this.parts.length; i++) { 
-      this.parts[i].draw(this.context);
+    for (i = 0; i < this.parts.length; i++) {
+        this.parts[i].draw(this.context);
     };
 };
 
@@ -83,7 +84,7 @@ try {
 catch(err) {
   console.log(err)
 }
-},{"./Part.js":2,"./Target.js":3}],2:[function(require,module,exports){
+},{"../lib/helper.js":4,"./Part.js":2,"./Target.js":3}],2:[function(require,module,exports){
 try {
   var helper = require('../lib/helper.js')
 }
@@ -127,9 +128,9 @@ catch(err) {
 
 function Target(canvas, targetValue) {
     this.targetValue = targetValue;
-    this.currentValue = 1;
+    this.currentValue = 1;    
     this.posx = canvas.width/2;
-    this.posy = canvas.width/2;
+    this.posy = canvas.height/2;
     this.radius = canvas.width/6;
     this.parts = [];
     this.signs = [];
@@ -162,7 +163,12 @@ function Target(canvas, targetValue) {
             this.signs.splice(index, 1);
         };
     };
-
+    this.update = function(canvas, context){
+        /*this.posx = canvas.width/2;
+        this.posy = canvas.height/2;
+        this.radius = canvas.width/6;
+        */this.draw(context);
+    };
     this.draw = function(context) {
         context.beginPath();
         context.arc(this.posx, this.posy, this.radius,0,2*Math.PI);
@@ -222,7 +228,22 @@ var helper = {
       sumParts *= partValue
     }
     return partValue, sumParts
-  }      
+  },
+  convertMouse: function(evt, canvas) {
+    if (evt.pageX || evt.pageY) { 
+      x = evt.offsetX;
+      y = evt.offsetY;
+    }
+    else { 
+      x = evt.clientX + document.body.scrollLeft + document.documentElement.scrollLeft; 
+      y = evt.clientY + document.body.scrollTop + document.documentElement.scrollTop; 
+    }
+    console.log('PageX: '+evt.pageX)
+    console.log('PageX: '+evt.pageX)
+    //x -= canvas.offsetLeft;
+    //y -= canvas.offsetTop;
+    return [x, y]
+  }
 };
 
 try {
@@ -242,20 +263,88 @@ catch(err) {
 
 var dragging = false;
 var activePart;
+var mouse
 
-$("document").ready(function() {GameSession.init()});
+canvas = $('<canvas>',
+    {
+        id: 'myCanvas',
+        class: '',
+    });
+canvas[0].width = 400
+canvas[0].height= 400
 
+button1 = $('<button>',
+    {
+        id:'myBtn',
+        onClick: 'GameSession.nextLevel()',
+        text:'New'
+    }
+);
+button1.append('<img width="50" src="./images/startbutton.png"/>')
+
+button2 = $('<button>',
+    {
+        id:'additionButton',
+        class: 'signs',
+        onClick:"GameSession.switch_sign($(this),'+')",
+    }
+);
+button2.append('<img width="50" src="./images/addition.gif"/>')
+
+button3 = $('<button>',
+    {
+        id:'subtractionButton',
+        class: 'signs',
+        onClick:"GameSession.switch_sign($(this),'-')",
+    }
+);
+button3.append('<img width="50" src="./images/Subtraction.jpg"/>')
+
+button4 = $('<button>',
+    {
+        id:'multiplicationButton',
+        class: 'signs',
+        onClick:"GameSession.switch_sign($(this),'*')",
+    }
+);
+button4.append('<img width="50" src="./images/multiply.png"/>')
+$("#content").append(canvas)
+
+buttons = $('<div>',
+    {
+        id: 'buttons',
+        class: ''
+    });
+$("#content").append(buttons)
+buttons.append(button1)
+buttons.append(button2)
+buttons.append(button3)
+buttons.append(button4)
+// Get Dom element for pure javascript
+var canvas = canvas[0]
+$("document").ready(function() {GameSession.init(canvas)});
+
+canvas.addEventListener("mousedown", mouseDownListener, false);
 window.addEventListener( 'resize', onWindowResize, false );
 function onWindowResize(){
     GameSession.update();
 }
+$(window).scroll(function() {
+    GameSession.update()
+});
+
 
 function mouseDownListener(evt) {
+    console.log('MouseEvent:'+helper.convertMouse(evt, canvas))
+    console.log('PartX:'+ GameSession.parts[0].posx)
+    console.log('PartY:'+ GameSession.parts[0].posy)
+
     //We are going to pay attention to the layering 
     //order of the objects so that if a mouse down occurs over more than object,
     //only the topmost one will be dragged. 
-    mouseX = (evt.clientX - GameSession.bRect.left)*(GameSession.canvas.width/GameSession.bRect.width);
-    mouseY = (evt.clientY - GameSession.bRect.top)*(GameSession.canvas.height/GameSession.bRect.height);
+    var mouse = helper.convertMouse(evt, canvas);
+    mouseX = mouse[0]
+    mouseY = mouse[1]
     dragging = false;
     GameSession.canvas.addEventListener("mouseup", mouseUpListener, false);
     for (i in GameSession.parts) {
@@ -273,12 +362,13 @@ function mouseDownListener(evt) {
 }
 
 function mouseUpListener(evt) { 
-    mouseX = (evt.clientX - GameSession.bRect.left)*(GameSession.canvas.width/GameSession.bRect.width);
-    mouseY = (evt.clientY - GameSession.bRect.top)*(GameSession.canvas.height/GameSession.bRect.height);
+    var mouse = helper.convertMouse(evt, canvas);
+    mouseX = mouse[0]
+    mouseY = mouse[1]
     GameSession.canvas.removeEventListener("mouseup", mouseUpListener, false);
     GameSession.canvas.addEventListener("mousedown", mouseDownListener, false);
     
-    if (!helper.contains(GameSession.target.parts, activePart)) {
+    if (activePart && !helper.contains(GameSession.target.parts, activePart)) {
         activePart.sign = ''
     };
     activePart = 0;
@@ -291,6 +381,11 @@ function mouseUpListener(evt) {
 };
 
 function mouseMoveListener(evt) {
+    //getting mouse position correctly
+    var mouse = helper.convertMouse(evt, canvas);
+    mouseX = mouse[0]
+    mouseY = mouse[1]
+
     if (dragging) {
         if (helper.hitTest(GameSession.target, mouseX, mouseY) 
             && !helper.contains(GameSession.target.parts, activePart)) {
@@ -305,18 +400,18 @@ function mouseMoveListener(evt) {
     maxX = GameSession.canvas.width - partRad;
     minY = partRad;
     maxY = GameSession.canvas.height - partRad;
-    //getting mouse position correctly 
-    mouseX = (evt.clientX - GameSession.bRect.left)*(GameSession.canvas.width/GameSession.bRect.width);
-    mouseY = (evt.clientY - GameSession.bRect.top)*(GameSession.canvas.height/GameSession.bRect.height);
-        
     //clamp x and y positions to prevent object from dragging outside of GameSession.canvas
-    posX = mouseX - dragHoldX;
+    posX = mouseX;
+    console.log('MouseX' + mouseX)
     posX = (posX < minX) ? minX : ((posX > maxX) ? maxX : posX);
-    posY = mouseY - dragHoldY;
+    console.log('posX' + posX)
+
+    posY = mouseY;
+    
     posY = (posY < minY) ? minY : ((posY > maxY) ? maxY : posY);
     activePart.posx = posX;
     activePart.posy = posY;
-    activePart.sign = GameSession.sign
+    activePart.sign = GameSession.sign || ''
     GameSession.update();
 };
 

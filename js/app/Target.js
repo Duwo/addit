@@ -7,9 +7,9 @@ catch(err) {
 
 function Target(canvas, targetValue) {
     this.targetValue = targetValue;
-    this.currentValue = 1;
+    this.currentValue = 1;    
     this.posx = canvas.width/2;
-    this.posy = canvas.width/2;
+    this.posy = canvas.height/2;
     this.radius = canvas.width/6;
     this.parts = [];
     this.signs = [];
@@ -42,7 +42,12 @@ function Target(canvas, targetValue) {
             this.signs.splice(index, 1);
         };
     };
-
+    this.update = function(canvas, context){
+        /*this.posx = canvas.width/2;
+        this.posy = canvas.height/2;
+        this.radius = canvas.width/6;
+        */this.draw(context);
+    };
     this.draw = function(context) {
         context.beginPath();
         context.arc(this.posx, this.posy, this.radius,0,2*Math.PI);
