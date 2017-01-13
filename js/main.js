@@ -1,4 +1,5 @@
 try {
+  require('./app/View.js');
   var GameSession = require('./app/GameSession.js');
   var helper = require('./lib/helper.js')
 }
@@ -8,65 +9,11 @@ catch(err) {
 
 var dragging = false;
 var activePart;
-var mouse
+var mouse;
 
-canvas = $('<canvas>',
-    {
-        id: 'myCanvas',
-        class: '',
-    });
-canvas[0].width = 400
-canvas[0].height= 400
-
-button1 = $('<button>',
-    {
-        id:'myBtn',
-        onClick: 'GameSession.nextLevel()',
-        text:'New'
-    }
-);
-button1.append('<img width="50" src="./images/startbutton.png"/>')
-
-button2 = $('<button>',
-    {
-        id:'additionButton',
-        class: 'signs',
-        onClick:"GameSession.switch_sign($(this),'+')",
-    }
-);
-button2.append('<img width="50" src="./images/addition.gif"/>')
-
-button3 = $('<button>',
-    {
-        id:'subtractionButton',
-        class: 'signs',
-        onClick:"GameSession.switch_sign($(this),'-')",
-    }
-);
-button3.append('<img width="50" src="./images/Subtraction.jpg"/>')
-
-button4 = $('<button>',
-    {
-        id:'multiplicationButton',
-        class: 'signs',
-        onClick:"GameSession.switch_sign($(this),'*')",
-    }
-);
-button4.append('<img width="50" src="./images/multiply.png"/>')
-$("#content").append(canvas)
-
-buttons = $('<div>',
-    {
-        id: 'buttons',
-        class: ''
-    });
-$("#content").append(buttons)
-buttons.append(button1)
-buttons.append(button2)
-buttons.append(button3)
-buttons.append(button4)
 // Get Dom element for pure javascript
-var canvas = canvas[0]
+var canvas = $('#myCanvas')[0]
+
 $("document").ready(function() {GameSession.init(canvas)});
 
 canvas.addEventListener("mousedown", mouseDownListener, false);

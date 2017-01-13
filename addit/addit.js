@@ -84,7 +84,7 @@ try {
 catch(err) {
   console.log(err)
 }
-},{"../lib/helper.js":4,"./Part.js":2,"./Target.js":3}],2:[function(require,module,exports){
+},{"../lib/helper.js":5,"./Part.js":2,"./Target.js":3}],2:[function(require,module,exports){
 try {
   var helper = require('../lib/helper.js')
 }
@@ -118,7 +118,7 @@ try {
 catch(err) {
   console.log(err)
 }
-},{"../lib/helper.js":4}],3:[function(require,module,exports){
+},{"../lib/helper.js":5}],3:[function(require,module,exports){
 try {
   var helper = require('../lib/helper.js')
 }
@@ -188,7 +188,63 @@ try {
 catch(err) {
   console.log(err)
 }
-},{"../lib/helper.js":4}],4:[function(require,module,exports){
+},{"../lib/helper.js":5}],4:[function(require,module,exports){
+static_path = 'https://erikrodhe.s3.amazonaws.com/static/addit'
+canvas = $('<canvas>',
+    {
+        id: "myCanvas",
+        class: ""
+    });
+buttons = $('<div>',
+    {
+        id: "buttons",
+        class: ""
+    });
+
+buttons_list = [
+  {
+    'id': "myBtn",
+    'event': "GameSession.nextLevel()",
+    'text': "New",
+    'image': "startbutton.png"
+  },
+  {
+    'id': "additionButton",
+    'event': "GameSession.switch_sign($(this),'+')",
+    'text': "",
+    'image': "addition.gif"
+  },
+  {
+    'id': "subtractionButton",
+    'event': "GameSession.switch_sign($(this),'-')",
+    'text': "",
+    'image': "Subtraction.jpg"
+  },
+  {
+    'id': "multiplicationButton",
+    'event': "GameSession.switch_sign($(this),'*')",
+    'text': "",
+    'image': "multiply.png"
+  }
+]
+
+for (var i in buttons_list) {
+    button = $('<button>',
+    {
+        id: buttons_list[i]['id'],
+        class: 'signs',
+        onClick: buttons_list[i]['event'],
+        text: buttons_list[i]['text']
+    });
+    button.append(`<img src="${static_path}/images/${buttons_list[i]['image']}"/>`)
+    buttons.append(button)
+};
+
+$("#content").append(canvas)
+$('#myCanvas')[0].width = 400;
+$('#myCanvas')[0].height = 400;
+$("#content").append(buttons)
+},{}],5:[function(require,module,exports){
 var helper = {
   getRandomColor: function() {
     letters = '0123456789ABCDEF'.split('');
@@ -252,8 +308,9 @@ try {
 catch(err) {
   console.log(err)
 }
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 try {
+  require('./app/View.js');
   var GameSession = require('./app/GameSession.js');
   var helper = require('./lib/helper.js')
 }
@@ -263,65 +320,11 @@ catch(err) {
 
 var dragging = false;
 var activePart;
-var mouse
+var mouse;
 
-canvas = $('<canvas>',
-    {
-        id: 'myCanvas',
-        class: '',
-    });
-canvas[0].width = 400
-canvas[0].height= 400
-
-button1 = $('<button>',
-    {
-        id:'myBtn',
-        onClick: 'GameSession.nextLevel()',
-        text:'New'
-    }
-);
-button1.append('<img width="50" src="./images/startbutton.png"/>')
-
-button2 = $('<button>',
-    {
-        id:'additionButton',
-        class: 'signs',
-        onClick:"GameSession.switch_sign($(this),'+')",
-    }
-);
-button2.append('<img width="50" src="./images/addition.gif"/>')
-
-button3 = $('<button>',
-    {
-        id:'subtractionButton',
-        class: 'signs',
-        onClick:"GameSession.switch_sign($(this),'-')",
-    }
-);
-button3.append('<img width="50" src="./images/Subtraction.jpg"/>')
-
-button4 = $('<button>',
-    {
-        id:'multiplicationButton',
-        class: 'signs',
-        onClick:"GameSession.switch_sign($(this),'*')",
-    }
-);
-button4.append('<img width="50" src="./images/multiply.png"/>')
-$("#content").append(canvas)
-
-buttons = $('<div>',
-    {
-        id: 'buttons',
-        class: ''
-    });
-$("#content").append(buttons)
-buttons.append(button1)
-buttons.append(button2)
-buttons.append(button3)
-buttons.append(button4)
 // Get Dom element for pure javascript
-var canvas = canvas[0]
+var canvas = $('#myCanvas')[0]
+
 $("document").ready(function() {GameSession.init(canvas)});
 
 canvas.addEventListener("mousedown", mouseDownListener, false);
@@ -451,4 +454,4 @@ function getMousePos(GameSession.canvas, evt) {
     };
 }
 */
-},{"./app/GameSession.js":1,"./lib/helper.js":4}]},{},[5]);
+},{"./app/GameSession.js":1,"./app/View.js":4,"./lib/helper.js":5}]},{},[6]);
