@@ -240,10 +240,10 @@ for (var i in buttons_list) {
     buttons.append(button)
 };
 
-$("#content").append(canvas)
+$("#app").append(canvas)
 $('#myCanvas')[0].width = 400;
 $('#myCanvas')[0].height = 400;
-$("#content").append(buttons)
+$("#app").append(buttons)
 },{}],5:[function(require,module,exports){
 var helper = {
   getRandomColor: function() {
