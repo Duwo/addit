@@ -189,7 +189,7 @@ catch(err) {
   console.log(err)
 }
 },{"../lib/helper.js":5}],4:[function(require,module,exports){
-static_path = '/static/addit'
+static_path = '.'
 canvas = $('<canvas>',
     {
         id: "myCanvas",
